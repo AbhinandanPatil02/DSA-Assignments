@@ -91,6 +91,12 @@ int main() {
     g.addedge(1, 2, 4, 0);
     g.addedge(1, 3, 2, 0);
     g.addedge(2, 3, 3, 0);
+    g.addedge(1, 5, 7, 0);
+    g.addedge(3, 4, 4, 0);
+    g.addedge(5, 4, 8, 0);
+    g.addedge(4, 6, 5, 0);
+    g.addedge(3, 6, 3, 0);
+
     g.print();
    
     g.prim();
