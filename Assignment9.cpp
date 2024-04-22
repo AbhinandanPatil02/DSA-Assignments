@@ -92,6 +92,7 @@ class AVL{
             root->right=rightrotate(root->right);
             return leftrotate(root);
         }
+        
         return root;
 
     }
@@ -126,9 +127,9 @@ class AVL{
     }
 
     void levelorder(node*root){
-        // if(root==NULL){
-        //     return;
-        // }
+        if(root==NULL){
+            return;
+        }
         queue<node*>q;
         q.push(root);
         q.push(NULL);
@@ -148,7 +149,7 @@ class AVL{
                 }
                 if(front->right!=NULL){
                     q.push(front->right);
-                }
+                }   
             }
         }
     }
@@ -164,47 +165,81 @@ class AVL{
         return temp;
     }
 
-    node*deletenode(node*root,int target){
-        if(root==NULL){
+    node* deletenode(node* root, int target) {
+    if (root == NULL) {
+        return NULL;
+    }
+
+    // Search for the target node
+    if (target < root->data) {
+        root->left = deletenode(root->left, target);
+    } 
+    else if (target > root->data) {
+        root->right = deletenode(root->right, target);
+    } 
+    else {
+        // Node to be deleted found
+        
+        // Case 1: Node has no children
+        if (root->left == NULL && root->right == NULL) {
+            delete root;
             return NULL;
         }
-        if(target==root->data){
-            if(root->left==NULL&&root->right==NULL){
-                delete root;
-                return NULL;
-            }
-            if(root->left!=NULL&&root->right==NULL){
-                node*subtree=root->left;
-                delete root;
-                return subtree;
-            }
-            if(root->right!=NULL&&root->left==NULL){
-                node*subtree=root->right;
-                delete root;
-                return subtree;
-            }
-
-            else{
-                node*min=mini(root->right);
-                root->data=min->data;
-                root->right=deletenode(root->right,min->data);
-                return root;
-            }
-
+        // Case 2: Node has one child
+        else if (root->left == NULL) {
+            node* temp = root->right;
+            delete root;
+            return temp;
+        } 
+        else if (root->right == NULL) {
+            node* temp = root->left;
+            delete root;
+            return temp;
         }
+        // Case 3: Node has two children
+        else {
+            // Find the minimum value node in the right subtree (or maximum value node in the left subtree)
+            node* temp = mini(root->right);
 
-        if(target>root->data){
-            root->right=deletenode(root->right,target);
-        }
-        else{
-            root->left=deletenode(root->left,target);
-        }
+            // Copy the data of the minimum value node to this node
+            root->data = temp->data;
 
-        return root;
+            // Delete the minimum value node
+            root->right = deletenode(root->right, temp->data);
+        }
     }
+
+    // Update height of the current node
+    root->height = 1 + max(height(root->left), height(root->right));
+
+    // Check balance factor and perform rotations if necessary
+    int balance = getbal(root);
+    //ll
+    if (balance > 1 && getbal(root->left) >= 0) {
+        return rightrotate(root);
+    }
+    //lr
+    if (balance > 1 && getbal(root->left) < 0) {
+        root->left = leftrotate(root->left);
+        return rightrotate(root);
+    }
+    //rr
+    if (balance < -1 && getbal(root->right) <= 0) {
+        return leftrotate(root);
+    }
+    //rl
+    if (balance < -1 && getbal(root->right) > 0) {
+        root->right = rightrotate(root->right);
+        return leftrotate(root);
+    }
+
+    return root;
+}
+
 
 };
 
+// 20 11 5 32 40 2 4 27 23 28 50 -1
 
 int main(){
     AVL t;
@@ -216,9 +251,22 @@ int main(){
     cout<<endl;
     cout<<"Level Order : "<<endl;
     t.levelorder(root);
-    cout<<"Deleting 11 "<<endl;
-    t.deletenode(root,11);
+    // cout<<"Deleting 11 "<<endl;
+    // t.deletenode(root,11);
     t.levelorder(root);
+    int k=1;
+    while(k!=-1){
+        int d;
+        cout<<"Data to delete : ";
+        cin>>d;
+        t.deletenode(root,d);
+
+        cout<<"After deletion of : "<<d<<endl;
+        t.levelorder(root);
+        cout<<"Want to cntinue : ";
+        cin>>k;
+    }
+
     
     return 0;
 }
